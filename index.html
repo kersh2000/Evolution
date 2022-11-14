@@ -6,16 +6,35 @@
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <header></header>
+  <header>
+    <section class="header-content">
+      <h1>Evolution Simulator</h1>
+      <p>This program is designed to simulate simple evolutionary processes by means of natural selection and basic genetics.</p>
+      <input type="checkbox" id="nav-toggle" class="nav-toggle">
+      <label for="nav-toggle" class="nav-toggle-label">
+        <span>X</span>
+      </label>
+      <nav>
+        <ul>
+          <li>
+            <button class="home-btn">Home</button>
+          </li>
+          <li>
+            <button class="instructions-btn">Instructions</button>
+          </li>
+          <li>
+            <button class="history-btn">History</button>
+          </li>
+          <li>
+            <button class="data-btn">Data</button>
+          </li>
+      </nav>
+  </section>
+  </header>
   <main>
     <div class="game">
       <div class="grid">
-        <div class="grid-background">
-          <canvas id="grid-pattern" width="500" height="500"></canvas>
-        </div>
-        <div class="objects">
-        </div>
-        <div class="selections"></div>
+        <div class="objects"></div>
       </div>
       <div class="buttons">
         <button class="move-button" type="button">Move</button>

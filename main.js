@@ -1,31 +1,9 @@
-function drawGridPattern(color){
-  var cnv = document.getElementById("grid-pattern");
-  var ctx = cnv.getContext("2d");
-
-  //drawing small squares
-  for(let i = 0; i <= 500; i += 10){
-
-    ctx.lineWidth = 1;
-
-    //vertical lines
-    ctx.moveTo(i, 0);
-    ctx.lineTo(i, 500);
-
-    //horizontal lines
-    ctx.moveTo(0, i);
-    ctx.lineTo(500, i);
-
-    ctx.strokeStyle = color;
-    ctx.stroke();
-
-  }
-}
-drawGridPattern("#000000");
-
 const objectDiv = document.querySelector('.objects');
 const numOfObjects = 250;
 const stepsPerGen = 100;
 const gridDim = 50;
+const movDist = 100 / gridDim;
+const movUnit = '%';
 const geneticRule = [0, 4, 8, 12, 16, 20, 24, 28, 32, 36, 40, 44, 48, 52, 55, 59, 62, 65, 66, 69];
 const genomeLength = geneticRule[geneticRule.length - 1];
 const mutationRate = genomeLength * 4;
@@ -526,8 +504,8 @@ function mutate(){
 function updateObjects(){
   for (let i = 0; i < numOfObjects; i++){
     const object = document.querySelectorAll('.object');
-    object[i].style.left = (objects[i].xcor * 10) + 'px';
-    object[i].style.top = (objects[i].ycor * 10) + 'px';
+    object[i].style.left = movDist * objects[i].xcor + movUnit;
+    object[i].style.top = movDist * objects[i].ycor + movUnit;
     object[i].style.backgroundColor = objects[i].color;
   }
 }
@@ -745,7 +723,7 @@ function pickButton(){
   for (let i = 0; i < children.length; i++){
     const child = children[i];
     child.addEventListener('click', () => {printObject(i)});
-    child.style.borderColor = 'white';
+    child.style.border = '1px solid white';
   }
 }
 
@@ -753,7 +731,7 @@ function clearOnClick() {
   const children = document.querySelector('.objects').children;
   for (let i = 0; i < children.length; i++){
     const child = children[i];
-    child.style.borderColor = 'black';
+    child.style.border = 'none';
     child.replaceWith(child.cloneNode(true));
   }
 }

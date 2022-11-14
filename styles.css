@@ -1,28 +1,101 @@
 body {
   margin: 0;
+  display: grid;
+  height: 200vh;
+  min-height: 100vh;
+  grid-template-rows: auto 1fr auto;
+  background-color: #333333;
+}
+
+header {
+  background-color: #222222;
+  color: white;
+  text-align: center;
+  position: fixed;
+  width: 100%;
+  z-index: 999;
+  display: flex;
+  justify-content: center;
+  opacity: 0.8;
+}
+
+.header-content {
+  max-width: 1000px;
+}
+
+.nav-toggle {
+  display: none;
+}
+
+.nav-toggle:checked ~ nav {
+  display: block;
+}
+
+nav {
+  background-color: #222222;
+  text-align: center;
+  display: none;
+}
+
+nav ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  width: 100vw;
+  max-width: 1000px;
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+}
+
+nav li {
+  margin-bottom: 1em;
+  margin-left: 1em;
+}
+
+nav button {
+  color: white;
+  background-color: #414c50;
+  border: none;
+  border-radius: 100vw;
+  padding: 5px 10px;
+  width: fit-content;
+  align-self: center;
+  text-transform: uppercase;
+  transition: padding 0.6s, background-color 0.4s, color 0.4s;
+}
+
+@media (min-width: 1025px) {
+  nav button:hover {
+    color: #39ace7;
+    padding: 5px 30px;
+    background-color: white;
+  }
 }
 
 .grid {
   position: absolute;
-  width: 500px;
-  height: 500px;
-  border: solid black 1px;
+  max-height: 80vh;
+  max-width: 80vh;
+  aspect-ratio: 1/1;
+  width: 80vw;
   background-color: black;
+}
+
+.objects {
+  width: 100%;
 }
 
 .object {
   position: absolute;
-  width: 8px;
-  height: 8px;
-  border: solid black 1px;
-  border-radius: 10px;
+  width: 1.6%;
+  aspect-ratio: 1/1;
   top: 0px;
   left: 0px;
 }
 
 .buttons {
-  position: absolute;
-  top: 520px;
+  position: relative;
+  top: 80vw;
 }
 
 .buttons button{

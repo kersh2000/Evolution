@@ -1,0 +1,101 @@
+body {
+  margin: 0;
+}
+
+.grid {
+  position: absolute;
+  width: 500px;
+  height: 500px;
+  border: solid black 1px;
+  background-color: black;
+}
+
+.object {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  border: solid black 1px;
+  border-radius: 10px;
+  top: 0px;
+  left: 0px;
+}
+
+.buttons {
+  position: absolute;
+  top: 520px;
+}
+
+.buttons button{
+  color: white;
+  border-radius: 5px;
+  font-weight: 1000;
+  font-family: 'Times New Roman', Times, serif;
+  transition: box-shadow 0.3s;
+}
+
+.buttons button:hover {
+  box-shadow: 2px 2px black;
+}
+
+.buttons button:active {
+  opacity: 50%;
+}
+
+.move-button {
+  background-color: blue;
+}
+
+.next-button {
+  background-color: darkgreen;
+}
+
+.select-button {
+  background-color: orangered;
+}
+
+.print-button {
+  background-color: indigo;
+}
+
+.pick-button {
+  background-color: chocolate;
+}
+
+.reset-button {
+  background-color: darkgoldenrod;
+}
+
+.kill-zone {
+  position: absolute;
+  top: 550px;
+}
+
+#x1-value, #x2-value, #y1-value, #y2-value{
+  width: 20px;
+}
+
+.myProgress {
+  position: absolute;
+  top: 580px;
+  width: 200px;
+  background-color: grey;
+}
+
+.myBar {
+  width: 0%;
+  height: 15px;
+  background-color: green;
+}
+
+#skip-value {
+  width: 50px;
+}
+
+.data {
+  position: absolute;
+  left: 550px;
+}
+
+.P1Mov-data {
+  
+}

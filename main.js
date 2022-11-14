@@ -25,9 +25,10 @@ drawGridPattern("#000000");
 const objectDiv = document.querySelector('.objects');
 const numOfObjects = 250;
 const stepsPerGen = 100;
-const mutationRate = 200;
 const gridDim = 50;
 const geneticRule = [0, 4, 8, 12, 16, 20, 24, 28, 32, 36, 40, 44, 48, 52, 55, 59, 62, 65, 66, 69];
+const genomeLength = geneticRule[geneticRule.length - 1];
+const mutationRate = genomeLength * 4;
 const geneticDescriptor = [
   "P1Mov - Promoter of 1st Movements", 
   "1MovU - 1st Movement Up", 
@@ -49,7 +50,6 @@ const geneticDescriptor = [
   "RepC - Replicase Chance", 
   "RepS - Replicase Substrate"
 ];
-const genomeLength = geneticRule[geneticRule.length - 1];
 
 for (let i = 0; i < geneticDescriptor.length; i++){
   let ending = ` (${geneticRule[i]} - ${geneticRule[i + 1]})`;

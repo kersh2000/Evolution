@@ -1,9 +1,18 @@
 body {
-  margin: 0;
+  margin: 10px;
+  background-color: #333333;
+  color: white;;
+}
+
+.game {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+  margin: 8px;
 }
 
 .grid {
-  position: absolute;
+  position: relative;
   width: 500px;
   height: 500px;
   border: solid black 1px;
@@ -96,6 +105,75 @@ body {
   left: 550px;
 }
 
-.P1Mov-data {
-  
+.genome-descriptor {
+  margin-top: 120px;
+}
+
+#object-name {
+  width: fit-content;
+  padding: 5px;
+  border-radius: 4px;
+}
+
+#genome {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+}
+
+.promoter {
+  border-radius: 14px;
+}
+
+.genome-marker {
+  display: inline-block;
+  position: relative;
+  vertical-align: top;
+  border: 2px solid black;
+  padding: 2px;
+  font-size: larger;
+  cursor: pointer;
+}
+
+.genome-marker-copy {
+  display: inline-block;
+  position: relative;
+  vertical-align: top;
+  border: 2px solid black;
+  padding: 2px;
+  font-size: larger;
+}
+
+.active-prom {
+  box-shadow: 0px 0px 5px 2px lightgreen;
+}
+
+.inactive-prom {
+  box-shadow: 0px 0px 5px 2px lightcoral;
+}
+
+.genome-label {
+  visibility: hidden;
+  position: absolute;
+  z-index: 1;
+  color: white;
+  top: 100%;
+  left: 0;
+  margin-top: 10px;
+  background-color: #222222;
+}
+
+.genome-marker:hover .genome-label {
+  visibility: visible;
+}
+
+.genome-marker:hover {
+  border: 3px solid white;
+  margin: 4px;
+  padding: 2px;
+  font-weight: bold;
+}
+
+.category {
+  text-decoration: underline;
 }

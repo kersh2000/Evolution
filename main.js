@@ -26,7 +26,8 @@ const objectDiv = document.querySelector('.objects');
 const numOfObjects = 250;
 const stepsPerGen = 100;
 const gridDim = 50;
-const geneticRule = [0, 4, 8, 12, 16, 20, 24, 28, 32, 36, 40, 44, 48, 52, 55, 59, 62, 65, 66, 69];
+const activationCodon = "TAT";
+const geneticRule = [0, 4, 8, 12, 16, 20, 24, 28, 32, 36, 40, 44, 48, 52, 55, 59, 62, 65, 66, 69, 77];
 const genomeLength = geneticRule[geneticRule.length - 1];
 const mutationRate = genomeLength * 4;
 const geneticDescriptor = [
@@ -48,8 +49,172 @@ const geneticDescriptor = [
   "MovYC - Movement Y Co-ordinate" ,
   "RepR - Replicase Receptor", 
   "RepC - Replicase Chance", 
-  "RepS - Replicase Substrate"
+  "RepS - Replicase Substrate",
+  "Rand - Random Identifier",
 ];
+
+const genomeKeys = {
+  "P1Mov": {
+    "description": "Promoter of 1st Movements",
+    "type": "promoter",
+    "start": 0,
+    "end": 4,
+    "summary": `This is the promoter of the 1st Movement category of genes responsible for activating the first set of movements.`,
+    "colour": "#99b3ff"
+  },
+  "1MovU": {
+    "description": "1st Movement Up",
+    "type": "movement",
+    "start": 4,
+    "end": 8,
+    "summary": "This gene allows the object to move upwards.",
+    "colour": "#99d7ff"
+  },
+  "1MovR": {
+    "description": "1st Movement Right",
+    "type": "movement",
+    "start": 8,
+    "end": 12,
+    "summary": "This gene allows the object to move to the right.",
+    "colour": "#99b3ff"
+  },
+  "1MovD": {
+    "description": "1st Movement Down",
+    "type": "movement",
+    "start": 12,
+    "end": 16,
+    "summary": "This gene allows the object to move downwards.",
+    "colour": "#99d7ff"
+  },
+  "1MovL": {
+    "description": "1st Movement Left",
+    "type": "movement",
+    "start": 16,
+    "end": 20,
+    "summary": "This gene allows the object to move to the left.",
+    "colour": "#99b3ff"
+  },
+  "1MovN": {
+    "description": "1st Movement None",
+    "type": "movement",
+    "start": 20,
+    "end": 24,
+    "summary": "This gene allows the object to remain stationary.",
+    "colour": "#99d7ff"
+  },
+  "P2Mov": {
+    "description": "Promoter of 2nd Movements",
+    "type": "promoter",
+    "start": 24,
+    "end": 28,
+    "summary": "This section of the genome activates the second set of movements.",
+    "colour": "#aaffba"
+  },
+  "2MovU": {
+    "description": "2nd Movement Up",
+    "type": "movement",
+    "start": 28,
+    "end": 32,
+    "summary": "This gene allows the object to move upwards in the second set of movements.",
+    "colour": "#cdffaa"
+  },
+  "2MovR": {
+    "description": "2nd Movement Right",
+    "type": "movement",
+    "start": 32,
+    "end": 36,
+    "summary": "This gene allows the object to move to the right in the second set of movements.",
+    "colour": "#aaffba"
+  },
+  "2MovD": {
+    "description": "2nd Movement Down",
+    "type": "movement",
+    "start": 36,
+    "end": 40,
+    "summary": "This gene allows the object to move downwards in the second set of movements.",
+    "colour": "#cdffaa"
+  },
+  "2MovL": {
+    "description": "2nd Movement Left",
+    "type": "movement",
+    "start": 40,
+    "end": 44,
+    "summary": "This gene allows the object to move to the left in the second set of movements.",
+    "colour": "#aaffba"
+  },
+  "2MovN": {
+    "description": "2nd Movement None",
+    "type": "movement",
+    "start": 44,
+    "end": 48,
+    "summary": "This gene allows the object to remain stationary in the second set of movements.",
+    "colour": "#cdffaa"
+  },
+  "PMovX": {
+    "description": "Promoter of Movement X",
+    "type": "promoter",
+    "start": 48,
+    "end": 52,
+    "summary": "This section of the genome activates movements along the X-axis.",
+    "colour": "#ffbbaa"
+  },
+  "MovXC": {
+    "description": "Movement X Co-ordinate",
+    "type": "coordinate",
+    "start": 52,
+    "end": 55,
+    "summary": "This gene determines the co-ordinate for movement along the X-axis.",
+    "colour": "#ffd9aa"
+  },
+  "PMovY": {
+    "description": "Promoter of Movement Y",
+    "type": "promoter",
+    "start": 55,
+    "end": 59,
+    "summary": "This section of the genome activates movements along the Y-axis.",
+    "colour": "#ffbbaa"
+  },
+  "MovYC": {
+    "description": "Movement Y Co-ordinate",
+    "type": "coordinate",
+    "start": 59,
+    "end": 62,
+    "summary": "This gene determines the co-ordinate for movement along the Y-axis.",
+    "colour": "#ffd9aa"
+  },
+  "RepR": {
+    "description": "Replicase Receptor",
+    "type": "receptor",
+    "start": 62,
+    "end": 65,
+    "summary": "This gene encodes a receptor for the replicase function, and binds to an object's RepS (substrate) section through DNA invesrion / binding.",
+    "colour": "#c0aaff"
+  },
+  "RepC": {
+    "description": "Replicase Chance",
+    "type": "chance",
+    "start": 65,
+    "end": 66,
+    "summary": "This gene determines the chance of replicase activity, and becomes active is the value is below 2.",
+    "colour": "#e5aaff"
+  },
+  "RepS": {
+    "description": "Replicase Substrate",
+    "type": "substrate",
+    "start": 66,
+    "end": 69,
+    "summary": "This gene encodes a substrate for the replicase function, and is found by an object's RepR (receptor) section through DNA invesrion / binding.",
+    "colour": "#c0aaff"
+  },
+  "Rand": {
+    "description": "Random Identifier",
+    "type": "identifier",
+    "start": 69,
+    "end": 77,
+    "summary": "This gene serves as a random identifier for the object and has no functional role within its activity.",
+    "colour": "#e7e7e7"
+  }
+};
 
 for (let i = 0; i < geneticDescriptor.length; i++){
   let ending = ` (${geneticRule[i]} - ${geneticRule[i + 1]})`;
@@ -65,7 +230,7 @@ const nucleotides = ['A', 'C', 'G', 'T'];
 var lineGraph, pieChart, pieLab, pieData;
 
 //create object
-class Object {
+class Blocks {
   constructor(genomeLength){
     this.xcor;
     this.ycor;
@@ -90,7 +255,7 @@ class Object {
 //create all objects
 function createObjects(){
   for (let i = 0; i < numOfObjects; i++){
-    objects.push(new Object(genomeLength));
+    objects.push(new Blocks(genomeLength));
   }
   genRandomCords();
 }
@@ -177,9 +342,8 @@ class Pol1{
   
   getPrimaryMov(){
     const genes = [this.genome.slice(geneticRule[0], geneticRule[1]), this.genome.slice(geneticRule[1], geneticRule[6])];
-    const activationCode = "TAT";
 
-    if(genes[0].includes(activationCode)){
+    if(genes[0].includes(activationCodon)){
       new Movements(this.object, this.cords, this.moved, genes[1]);
     }
   }
@@ -197,9 +361,8 @@ class Pol2{
 
   getSecondaryMov(){
     let genes = [this.genome.slice(geneticRule[6], geneticRule[7]), this.genome.slice(geneticRule[7], geneticRule[12])];
-    let activationCode = "TAT";
 
-    if(genes[0].includes(activationCode)){
+    if(genes[0].includes(activationCodon)){
       new Movements(this.object, this.cords, this.moved, genes[1]);
     }
   }
@@ -220,12 +383,11 @@ class Pol3{
     this.genome.slice(geneticRule[13], geneticRule[14]), 
     this.genome.slice(geneticRule[14], geneticRule[15]), 
     this.genome.slice(geneticRule[15], geneticRule[16])];
-    let activationCode = "TAT";
 
     let targetX = dnaToNum(genes[1]);
     let targetY = dnaToNum(genes[3]);
-    let xActive = genes[0].includes(activationCode);
-    let yActive = genes[2].includes(activationCode);
+    let xActive = genes[0].includes(activationCodon);
+    let yActive = genes[2].includes(activationCodon);
     let xMov, yMov = undefined;
 
     if(!(xActive || yActive)){
@@ -298,7 +460,7 @@ class Replicase1{
 
     let matches = [];
     for (let i = 0; i < this.op.length; i++){
-      if (recSeq === (this.objects[this.op[i]].genome.slice(79, 84))){
+      if (recSeq === (invertDNA(this.objects[this.op[i]].genome.slice(66, 69)))){
         matches.push(i);
       }
     }
@@ -309,6 +471,29 @@ class Replicase1{
       return Math.round(Math.random() * (this.op.length - 1));
     }
   }
+}
+
+function invertDNA(dna){
+  let inverted = "";
+  for (let i = 0; i < dna.length; i++){
+    switch(dna[i]){
+      case 'A':
+        inverted += 'T';
+        break;
+      case 'T':
+        inverted += 'A';
+        break;
+      case 'C':
+        inverted += 'G';
+        break;
+      case 'G':
+        inverted += 'C';
+        break;
+      default:
+        inverted += dna[i];
+    }
+  }
+  return inverted;
 }
 
 //Movements class
@@ -541,6 +726,9 @@ function nextGeneration(){
 }
 
 function moveButton(){
+  const button = document.querySelector('.move-button');
+  button.disabled = true;
+  button.style.opacity = 0.5;
   document.querySelector('.myBar').style.width = "0%";
   let track = 0;
   let width = 0;
@@ -554,6 +742,8 @@ function moveButton(){
     if(track === stepsPerGen){
       document.querySelector('.myBar').style.width = "0%";
       clearInterval(myInterval);
+      button.disabled = false;
+      button.style.opacity = 1;
     }else{
       width += (100/stepsPerGen);
       elem.style.width = width + "%";
@@ -568,6 +758,14 @@ function nextButton(){
 }
 
 function skipButton(){
+  const skipValue = document.getElementById("skip-value");
+  if(skipValue.value === "" || isNaN(parseInt(skipValue.value)) || parseInt(skipValue.value) <= 0){
+    alert("Please enter a valid skip value greater than 0.");
+    return;
+  }
+  const skipButton = document.querySelector('#skip-button');
+  skipButton.disabled = true;
+  skipButton.style.opacity = 0.5;
   document.querySelector('.myBar').style.width = "0%";
   let skips = parseInt(document.getElementById("skip-value").value);
   let track = 0;
@@ -584,6 +782,8 @@ function skipButton(){
       updateObjects();
       document.querySelector('.myBar').style.width = "0%";
       clearInterval(myInterval2);
+      skipButton.disabled = false;
+      skipButton.style.opacity = 1;
     }else{
       width += (100/skips);
       elem.style.width = width + "%";
@@ -693,7 +893,13 @@ function data(){
 }
 
 function selectButton(){
-  drawGridPattern("#ffffff");
+  var cnv = document.getElementById("grid-pattern");
+  var ctx = cnv.getContext("2d");
+  if (ctx.strokeStyle === "#000000"){
+    drawGridPattern("#ffffff");
+  } else {
+    drawGridPattern("#000000");
+  }
 }
 
 function killButton(){
@@ -710,6 +916,8 @@ function killButton(){
 function resetButton(){
   survivalRate = [];
   objects = [];
+  killZone = [0, 44, 0, 49];
+  isKill = true;
   createObjects();
   drawObjects();
   updateObjects();
@@ -719,6 +927,11 @@ function resetButton(){
   if(pieChart !== undefined){
     pieChart.destroy();
   }
+  document.querySelector('.genome-descriptor').innerHTML = `
+  <h3 id="object-name"></h3>
+  <div id="genome"></div>
+  <div id="genes"></div>
+  `;
 }
 
 function addOptions(){
@@ -744,9 +957,10 @@ function pickButton(){
   const children = document.querySelector('.objects').children;
   for (let i = 0; i < children.length; i++){
     const child = children[i];
-    child.addEventListener('click', () => {printObject(i)});
+    child.addEventListener('click', () => {printObjectsDetail(i)});
     child.style.borderColor = 'white';
   }
+  document.querySelector('#genes').innerHTML = '';
 }
 
 function clearOnClick() {
@@ -756,6 +970,195 @@ function clearOnClick() {
     child.style.borderColor = 'black';
     child.replaceWith(child.cloneNode(true));
   }
+}
+
+function printObjectsDetail(id) {
+  const genome = objects[id].genome;
+  const colour = objects[id].color;
+
+  const genomeName = document.querySelector('#object-name');
+  genomeName.textContent = `Object ${id + 1}`;
+  genomeName.style.color = getContrastYIQ(colour);
+  genomeName.style.backgroundColor = colour;
+
+  const genomeComponent = document.querySelector('#genome');
+  genomeComponent.innerHTML = '';
+
+  let counter = 0;
+  Object.keys(genomeKeys).forEach(key => {
+    const descriptor = genomeKeys[key];
+    const start = descriptor.start;
+    const end = descriptor.end;
+    const value = genome.slice(start, end);
+    const highlightColour = descriptor.colour;
+    
+    const marker = document.createElement('mark');
+    marker.style.backgroundColor = highlightColour;
+    marker.textContent = value;
+    marker.className = 'genome-marker';
+    if (descriptor.type === 'promoter') {
+      marker.classList.add('promoter');
+      if (value.includes(activationCodon)) {
+        marker.classList.add('active-prom');
+      } else {
+        marker.classList.add('inactive-prom');
+      }
+    }
+
+    const label = document.createElement('span');
+    label.textContent = `${key} - ${descriptor.description}`;
+    label.className = 'genome-label';
+
+    marker.appendChild(label);
+
+    marker.addEventListener('click', () => {
+      pickGene(genome, key);
+    });
+    genomeComponent.appendChild(marker);
+    counter ++;
+  });
+
+
+  clearOnClick();
+}
+
+function getContrastYIQ(hexcolor) {
+  hexcolor = hexcolor.replace("#", "");
+
+  const r = parseInt(hexcolor.substr(0, 2), 16);
+  const g = parseInt(hexcolor.substr(2, 2), 16);
+  const b = parseInt(hexcolor.substr(4, 2), 16);
+
+  const yiq = (r * 299 + g * 587 + b * 114) / 1000;
+
+  return yiq >= 128 ? "black" : "white";
+}
+
+function pickGene(genome, geneKey) {
+  const geneComponent = document.querySelector('#genes');
+  geneComponent.innerHTML = '';
+  let movementsIncluded = false;
+  let movementValues = [];
+  let title = "";
+  let geneList = [];
+
+  // First movement category
+  if (geneKey.includes("1") && geneKey.includes("Mov")) {
+    title = "1st Movement Category";
+    geneList = ["P1Mov", "1MovU", "1MovR", "1MovD", "1MovL", "1MovN"];
+  }
+  // Second movement category
+  else if (geneKey.includes("2") && geneKey.includes("Mov")) {
+    title = "2nd Movement Category";
+    geneList = ["P2Mov", "2MovU", "2MovR", "2MovD", "2MovL", "2MovN"];
+  }
+  // Specific movements
+  else if (geneKey.includes("MovX") || geneKey.includes("MovY")) {
+    title = "Specific Movement Category";
+    geneList = ["PMovX", "MovXC", "PMovY", "MovYC"];
+  }
+  // Replicase genes
+  else if (geneKey.includes("Rep")) {
+    title = "Replicase Genes";
+    geneList = ["RepR", "RepC", "RepS"];
+  }
+  // Random identifier
+  else if (geneKey.includes("Rand")) {
+    title = "Random Identifier";
+    geneList = ["Rand"];
+  }
+
+  const categoryHeading = document.createElement('h2');
+  categoryHeading.textContent = title;
+  categoryHeading.className = 'category';
+  geneComponent.appendChild(categoryHeading);
+
+    geneList.forEach(gene => {
+      const info = genomeKeys[gene];
+      const start = info.start;
+      const end = info.end;
+      const value = genome.slice(start, end);
+      const summary = info.summary;
+      const highlightColour = info.colour;
+
+      const geneElement = document.createElement('div');
+      const geneName = document.createElement('h3');
+      geneName.textContent = `${gene} -  ${info.description}`;
+      geneName.style.fontStyle = 'italic';
+      geneName.style.textDecoration = 'underline';
+
+      const marker = document.createElement('mark');
+      marker.style.backgroundColor = highlightColour;
+      marker.textContent = value;
+      marker.className = 'genome-marker-copy';
+
+      const geneSummary = document.createElement('p');
+      geneSummary.textContent = summary;
+
+      geneElement.append(geneName, marker, geneSummary);
+
+      if (info.type === 'promoter') {
+        const promInfo = document.createElement('p');
+        promInfo.textContent = `A promoter must contain the activation codon "${activationCodon}" to be active. For this promoter, it is ${value.includes(activationCodon) ? 'active' : 'inactive'}.`;
+        geneElement.appendChild(promInfo);
+      } else if (info.type === 'movement') {R
+        movementsIncluded = true;
+        const descriptions = document.createElement('div');
+
+        const movementInfo = document.createElement('p');
+        movementInfo.textContent = `This gene allows the object to move in the specified direction using probability by converting the nucleotides into numbers by using the bases as a 4-base number system, starting from lowest to highest value: A, C, G, T (alphabetical).`;
+
+        const movementCalc = document.createElement('p');
+        const movVal =  dnaToNum(value);
+        movementValues.push(movVal);
+        movementCalc.textContent = `The value of this gene is ${movVal} out of a maximum of ${dnaToNum('T'.repeat(end - start))}.`;
+
+        const movementExplanation = document.createElement('p');
+        movementExplanation.textContent = `*The value itself does not directly determine the movement, but rather the probability of moving in that direction when compared to the other values of the other movement genes within the same category. A random number is picked within the range of the sum of all the values, which determines the chance of movement. The higher the value, the higher the chance.`;
+
+        descriptions.append(movementInfo, movementCalc, movementExplanation);
+        geneElement.appendChild(descriptions);
+      } else if (info.type === 'coordinate') {
+        const coordValue = dnaToNum(value);
+        const coordInfo = document.createElement('p');
+        coordInfo.textContent = `This gene determines the co-ordinate for movement along the ${gene.includes('X') ? 'X' : 'Y'}-axis. The value is ${coordValue} out of a maximum of ${dnaToNum('T'.repeat(end - start))}. A value above ${gridDim - 1} will cause a random direction, and a value below 0 will be capped to 0, but if the value is equal to the object's current co-ordinate, it will not change the object's position.`;
+
+        geneElement.appendChild(coordInfo);
+      } else if (info.type === 'receptor') {
+        const receptorInfo = document.createElement('p');
+        receptorInfo.textContent = `The target substrate for receptor ${value} is ${invertDNA(value)}. The number of objects which contain this substrate is ${objects.filter(obj => obj.genome.slice(geneticRule[18], geneticRule[19]).includes(invertDNA(value))).length}.`;
+
+        geneElement.appendChild(receptorInfo);
+      } else if (info.type === 'chance') {
+        const chanceValue = dnaToNum(value);
+        const chanceInfo = document.createElement('p');
+        chanceInfo.textContent = `The genes value is ${chanceValue}, so it is ${(chanceValue < 2 ? 'active' : 'inactive')}.`;
+
+        geneElement.appendChild(chanceInfo);
+      } else if (info.type === 'substrate') {
+        const substrateInfo = document.createElement('p');
+        substrateInfo.textContent = `The target receptor for substrate ${value} is ${invertDNA(value)}. The number of objects which contain this receptor is ${objects.filter(obj => obj.genome.slice(geneticRule[18], geneticRule[19]).includes(invertDNA(value))).length}.`;
+
+        geneElement.appendChild(substrateInfo);
+      }
+      geneComponent.appendChild(geneElement);
+    });
+
+    if (movementsIncluded) {
+      const movementTitle = document.createElement('h3');
+      movementTitle.textContent = "Movement Calculations";
+      movementTitle.style.textDecoration = 'underline';
+
+      const movementSummary = document.createElement('p');
+      movementSummary.textContent = `The values for the movements in this category are: Up: ${movementValues[0]}, Right: ${movementValues[1]}, Down: ${movementValues[2]}, Left: ${movementValues[3]}, None: ${movementValues[4]}.`;
+
+      const movementProbs = document.createElement('p');
+      const movTotal = movementValues.reduce((a, b) => a + b, 0);
+      const movementProbsValues = movementValues.map(value => (value / movTotal * 100).toFixed(2) + '%');
+      movementProbs.textContent = `Movement probabilities: Up: ${movementProbsValues[0]}, Right: ${movementProbsValues[1]}, Down: ${movementProbsValues[2]}, Left: ${movementProbsValues[3]}, None: ${movementProbsValues[4]}.`;
+
+      geneComponent.append(movementTitle, movementSummary, movementProbs);
+    }
 }
 
 function printObject(id) {

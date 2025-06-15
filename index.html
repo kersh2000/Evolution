@@ -9,42 +9,45 @@
   <header></header>
   <main>
     <div class="game">
-      <div class="grid">
-        <div class="grid-background">
-          <canvas id="grid-pattern" width="500" height="500"></canvas>
+      <div>
+        <div class="grid">
+          <div class="grid-background">
+            <canvas id="grid-pattern" width="500" height="500"></canvas>
+          </div>
+          <div class="objects">
+          </div>
+          <div class="selections"></div>
         </div>
-        <div class="objects">
+        <div class="buttons">
+          <button class="move-button" type="button">Move</button>
+          <button class="next-button" type="button">Next</button>
+          <button class="select-button" type="button">Select</button>
+          <button class="print-button" type="button">Print</button>
+          <button class="pick-button" type="button">Pick</button>
+          <label>Skip</label>
+          <input type="text" id="skip-value" name="skip-value">
+          <input type="submit" value="Submit" id="skip-button">
+          <button class="reset-button" type="button">Reset</button>
         </div>
-        <div class="selections"></div>
+        <div class="kill-zone">
+          <label>x1</label>
+          <input type="text" id="x1-value" name="x1-value">
+          <label>x2</label>
+          <input type="text" id="x2-value" name="x2-value">
+          <label>y1</label>
+          <input type="text" id="y1-value" name="y1-value">
+          <label>y2</label>
+          <input type="text" id="y2-value" name="y2-value">
+          <label>Safe</label>
+          <input type="checkbox" id="safe-box">
+          <input type="submit" value="Submit" id="kill-button">
+        </div>
+        <div class="myProgress">
+          <div class="myBar"></div>
+        </div>
       </div>
-      <div class="buttons">
-        <button class="move-button" type="button">Move</button>
-        <button class="next-button" type="button">Next</button>
-        <button class="select-button" type="button">Select</button>
-        <button class="print-button" type="button">Print</button>
-        <button class="pick-button" type="button">Pick</button>
-        <label>Skip</label>
-        <input type="text" id="skip-value" name="skip-value">
-        <input type="submit" value="Submit" id="skip-button">
-        <button class="reset-button" type="button">Reset</button>
-      </div>
-      <div class="kill-zone">
-        <label>x1</label>
-        <input type="text" id="x1-value" name="x1-value">
-        <label>x2</label>
-        <input type="text" id="x2-value" name="x2-value">
-        <label>y1</label>
-        <input type="text" id="y1-value" name="y1-value">
-        <label>y2</label>
-        <input type="text" id="y2-value" name="y2-value">
-        <label>Safe</label>
-        <input type="checkbox" id="safe-box">
-        <input type="submit" value="Submit" id="kill-button">
-      </div>
-      <div class="myProgress">
-        <div class="myBar"></div>
-      </div>
-      <div class="data">
+      <div>
+        <div class="data">
         <div class="survival-rate-data">
           <canvas id="survival-rate-chart"></canvas>
         </div>
@@ -57,7 +60,14 @@
           </div>
         </div>
       </div>
-    </main>
+      </div>
+    </div>
+    <div class="genome-descriptor">
+        <h3 id="object-name"></h3>
+        <div id="genome"></div>
+        <div id="genes"></div>
+    </div>
+  </main>
   <footer></footer>
   </div>
   <script src="./node_modules/chart.js/dist/chart.min.js"></script>

@@ -22,6 +22,7 @@ function drawGridPattern(color){
 }
 drawGridPattern("#000000");
 
+const chartInstances = {};
 const objectDiv = document.querySelector('.objects');
 const numOfObjects = 250;
 const stepsPerGen = 100;
@@ -226,6 +227,7 @@ var killZone = [0, 44, 0, 49];
 var isKill = true;
 var survivalRate = [];
 var genomeicFrequencies = [];
+let replicaseMatches = 0;
 const nucleotides = ['A', 'C', 'G', 'T'];
 var lineGraph, pieChart, pieLab, pieData;
 
@@ -459,9 +461,16 @@ class Replicase1{
     }
 
     let matches = [];
-    for (let i = 0; i < this.op.length; i++){
-      if (recSeq === (invertDNA(this.objects[this.op[i]].genome.slice(66, 69)))){
+    for (let i = 0; i < this.op.length; i++) {
+      const target = invertDNA(this.objects[this.op[i]].genome.slice(66, 69));
+      let sameCount = 0;
+      for (let j = 0; j < 3; j++) {
+        if (recSeq[j] === target[j]) sameCount++;
+      }
+      if (sameCount >= 2) {
         matches.push(i);
+        replicaseMatches++;
+        console.log("MATCH");
       }
     }
 
@@ -718,6 +727,7 @@ function updateObjects(){
 }
 
 function nextGeneration(){
+  replicaseMatches = 0;
   let indicies = kill();
   duplicate(indicies);
   mutate();
@@ -836,6 +846,7 @@ function printButton(){
   }
   printGenomeFrequencies();
   data();
+  collectObjectData();
 }
 
 function data(){
@@ -1101,7 +1112,7 @@ function pickGene(genome, geneKey) {
         const promInfo = document.createElement('p');
         promInfo.textContent = `A promoter must contain the activation codon "${activationCodon}" to be active. For this promoter, it is ${value.includes(activationCodon) ? 'active' : 'inactive'}.`;
         geneElement.appendChild(promInfo);
-      } else if (info.type === 'movement') {R
+      } else if (info.type === 'movement') {
         movementsIncluded = true;
         const descriptions = document.createElement('div');
 
@@ -1176,6 +1187,355 @@ function dnaToNum(dna) {
   return decimal;
 }
 
+function collectObjectData() {
+  let analytics = {
+    "totalObjects": objects.length,
+    "1mov": {
+      "active": 0,
+      "inactive": 0,
+      "averages": {
+        "up": 0,
+        "right": 0,
+        "down": 0,
+        "left": 0,
+        "none": 0
+      }
+    },
+    "2mov": {
+      "active": 0,
+      "inactive": 0,
+      "averages": {
+        "up": 0,
+        "right": 0,
+        "down": 0,
+        "left": 0,
+        "none": 0
+      }
+    },
+    "specificMovements": {
+      "xActive": 0,
+      "xInactive": 0,
+      "yActive": 0,
+      "yInactive": 0,
+      "averageXCoord": 0,
+      "averageYCoord": 0
+    },
+    "replicase": {
+      "active": 0,
+      "inactive": 0,
+      "averageChance": 0,
+      "top5ActiveReceptors": {},
+      "top5ActiveSubstrates": {}
+    },
+    "randomIdentifier": {
+      "frequency": {},
+    }
+  };
+
+  objects.forEach(obj => {
+    // 1st Movement
+    const p1Mov = obj.genome.slice(geneticRule[0], geneticRule[1]);
+    if (p1Mov.includes(activationCodon)) {
+      analytics["1mov"]["active"]++;
+      const movU = dnaToNum(obj.genome.slice(geneticRule[1], geneticRule[2]));
+      const movR = dnaToNum(obj.genome.slice(geneticRule[2], geneticRule[3]));
+      const movD = dnaToNum(obj.genome.slice(geneticRule[3], geneticRule[4]));
+      const movL = dnaToNum(obj.genome.slice(geneticRule[4], geneticRule[5]));
+      const movN = dnaToNum(obj.genome.slice(geneticRule[5], geneticRule[6]));
+      const movTotal = movU + movR + movD + movL + movN;
+      analytics["1mov"]["averages"]["up"] += movU/movTotal;
+      analytics["1mov"]["averages"]["right"] += movR/movTotal;
+      analytics["1mov"]["averages"]["down"] += movD/movTotal;
+      analytics["1mov"]["averages"]["left"] += movL/movTotal;
+      analytics["1mov"]["averages"]["none"] += movN/movTotal;
+    } else {
+      analytics["1mov"]["inactive"]++;
+    }
+
+    // 2nd Movement
+    const p2Mov = obj.genome.slice(geneticRule[6], geneticRule[7]);
+    if (p2Mov.includes(activationCodon)) {
+      analytics["2mov"]["active"]++;
+      const movU = dnaToNum(obj.genome.slice(geneticRule[7], geneticRule[8]));
+      const movR = dnaToNum(obj.genome.slice(geneticRule[8], geneticRule[9]));
+      const movD = dnaToNum(obj.genome.slice(geneticRule[9], geneticRule[10]));
+      const movL = dnaToNum(obj.genome.slice(geneticRule[10], geneticRule[11]));
+      const movN = dnaToNum(obj.genome.slice(geneticRule[11], geneticRule[12]));
+      const movTotal = movU + movR + movD + movL + movN;
+      analytics["2mov"]["averages"]["up"] += movU/movTotal;
+      analytics["2mov"]["averages"]["right"] += movR/movTotal;
+      analytics["2mov"]["averages"]["down"] += movD/movTotal;
+      analytics["2mov"]["averages"]["left"] += movL/movTotal;
+      analytics["2mov"]["averages"]["none"] += movN/movTotal;
+    } else {
+      analytics["2mov"]["inactive"]++;
+    }
+
+    // 3rd Movement
+    const specificMovX = obj.genome.slice(geneticRule[12], geneticRule[13]);
+    const specificMovY = obj.genome.slice(geneticRule[14], geneticRule[15]);
+    if (specificMovX.includes(activationCodon)) {
+      analytics["specificMovements"]["xActive"]++;
+      analytics["specificMovements"]["averageXCoord"] += dnaToNum(obj.genome.slice(geneticRule[13], geneticRule[14]));
+    } else {
+      analytics["specificMovements"]["xInactive"]++;
+    }
+    if (specificMovY.includes(activationCodon)) {
+      analytics["specificMovements"]["yActive"]++;
+      analytics["specificMovements"]["averageYCoord"] += dnaToNum(obj.genome.slice(geneticRule[15], geneticRule[16]));
+    } else {
+      analytics["specificMovements"]["yInactive"]++;
+    }
+
+    // Replicase
+    const replicaseChance = dnaToNum(obj.genome.slice(geneticRule[17], geneticRule[18]));
+    analytics["replicase"]["averageChance"] += replicaseChance;
+    if (replicaseChance < 2) {
+      analytics["replicase"]["active"]++;
+      const receptor = obj.genome.slice(geneticRule[16], geneticRule[17]);
+      const substrate = obj.genome.slice(geneticRule[18], geneticRule[19]);
+
+      // Top 5 receptors
+      if (!analytics["replicase"]["top5ActiveReceptors"].hasOwnProperty(receptor)) {
+        analytics["replicase"]["top5ActiveReceptors"][receptor] = 0;
+      } else {
+        analytics["replicase"]["top5ActiveReceptors"][receptor]++;
+      }
+      // Top 5 substrates
+      if (!analytics["replicase"]["top5ActiveSubstrates"].hasOwnProperty(substrate)) {
+        analytics["replicase"]["top5ActiveSubstrates"][substrate] = 0;
+      } else {
+        analytics["replicase"]["top5ActiveSubstrates"][substrate]++;
+      }
+    } else {
+      analytics["replicase"]["inactive"]++;
+    }
+
+    // Random Identifier
+    const randomIdentifier = obj.genome.slice(geneticRule[19], geneticRule[20]);
+    if (!analytics["randomIdentifier"]["frequency"].hasOwnProperty(randomIdentifier)) {
+      analytics["randomIdentifier"]["frequency"][randomIdentifier] = 0;
+    } else {
+      analytics["randomIdentifier"]["frequency"][randomIdentifier]++;
+    }
+  });
+
+  analytics["1mov"]["averages"]["up"] /= analytics["1mov"]["active"];
+  analytics["1mov"]["averages"]["right"] /= analytics["1mov"]["active"];
+  analytics["1mov"]["averages"]["down"] /= analytics["1mov"]["active"];
+  analytics["1mov"]["averages"]["left"] /= analytics["1mov"]["active"];
+  analytics["1mov"]["averages"]["none"] /= analytics["1mov"]["active"];
+
+  analytics["2mov"]["averages"]["up"] /= analytics["2mov"]["active"];
+  analytics["2mov"]["averages"]["right"] /= analytics["2mov"]["active"];
+  analytics["2mov"]["averages"]["down"] /= analytics["2mov"]["active"];
+  analytics["2mov"]["averages"]["left"] /= analytics["2mov"]["active"];
+  analytics["2mov"]["averages"]["none"] /= analytics["2mov"]["active"];
+
+  analytics["specificMovements"]["averageXCoord"] /= analytics["specificMovements"]["xActive"];
+  analytics["specificMovements"]["averageYCoord"] /= analytics["specificMovements"]["yActive"];
+
+  analytics["replicase"]["averageChance"] /= analytics["totalObjects"];
+  analytics["replicase"]["top5ActiveReceptors"] = Object.entries(analytics["replicase"]["top5ActiveReceptors"])
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 5)
+    .reduce((obj, [key, value]) => ({ ...obj, [key]: value }), {});
+  analytics["replicase"]["top5ActiveSubstrates"] = Object.entries(analytics["replicase"]["top5ActiveSubstrates"])
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 5)
+    .reduce((obj, [key, value]) => ({ ...obj, [key]: value }), {});
+  
+  analytics["randomIdentifier"]["frequency"] = Object.entries(analytics["randomIdentifier"]["frequency"])
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 15)
+    .reduce((obj, [key, value]) => ({ ...obj, [key]: value }), {});
+  
+  return analytics;
+}
+
+function dataButton() {
+  console.log("Previous Matches:", replicaseMatches);
+
+  const analytics = collectObjectData();
+
+  const dataDiv = document.querySelector('.large-data');
+  dataDiv.style.visibility = 'visible';
+  destroyAllCharts();
+
+  // 1st Movement Pie Chart
+  chartInstances['1-mov-active-pie-chart'] = new Chart(document.getElementById("1-mov-active-pie-chart"), {
+    type: 'pie',
+    data: {
+      labels: ['Active', 'Inactive'],
+      datasets: [{
+        data: [analytics["1mov"].active, analytics["1mov"].inactive],
+        backgroundColor: ['#36A2EB', '#FF6384']
+      }]
+    }
+  });
+
+  // 1st Movement Direction Bar Chart
+  chartInstances['1-mov-bar-chart'] = new Chart(document.getElementById("1-mov-bar-chart"), {
+    type: 'bar',
+    data: {
+      labels: ['Up', 'Right', 'Down', 'Left', 'None'],
+      datasets: [{
+        label: 'Average',
+        data: [
+          analytics["1mov"].averages.up,
+          analytics["1mov"].averages.right,
+          analytics["1mov"].averages.down,
+          analytics["1mov"].averages.left,
+          analytics["1mov"].averages.none
+        ],
+        backgroundColor: '#36A2EB'
+      }]
+    }
+  });
+
+  // 2nd Movement Pie Chart
+  chartInstances['2-mov-active-pie-chart'] = new Chart(document.getElementById("2-mov-active-pie-chart"), {
+    type: 'pie',
+    data: {
+      labels: ['Active', 'Inactive'],
+      datasets: [{
+        data: [analytics["2mov"].active, analytics["2mov"].inactive],
+        backgroundColor: ['#36A2EB', '#FF6384']
+      }]
+    }
+  });
+
+  // 2nd Movement Direction Bar Chart
+  chartInstances['2-mov-bar-chart'] = new Chart(document.getElementById("2-mov-bar-chart"), {
+    type: 'bar',
+    data: {
+      labels: ['Up', 'Right', 'Down', 'Left', 'None'],
+      datasets: [{
+        label: 'Average',
+        data: [
+          analytics["2mov"].averages.up,
+          analytics["2mov"].averages.right,
+          analytics["2mov"].averages.down,
+          analytics["2mov"].averages.left,
+          analytics["2mov"].averages.none
+        ],
+        backgroundColor: '#36A2EB'
+      }]
+    }
+  });
+
+  // 3rd Movement X Active Pie Chart
+  chartInstances['3-mov-x-active-pie-chart'] = new Chart(document.getElementById("3-mov-x-active-pie-chart"), {
+    type: 'pie',
+    data: {
+      labels: ['X Active', 'X Inactive'],
+      datasets: [{
+        data: [analytics.specificMovements.xActive, analytics.specificMovements.xInactive],
+        backgroundColor: ['#36A2EB', '#FF6384']
+      }]
+    }
+  });
+
+  // 3rd Movement Y Active Pie Chart
+  chartInstances['3-mov-y-active-pie-chart'] = new Chart(document.getElementById("3-mov-y-active-pie-chart"), {
+    type: 'pie',
+    data: {
+      labels: ['Y Active', 'Y Inactive'],
+      datasets: [{
+        data: [analytics.specificMovements.yActive, analytics.specificMovements.yInactive],
+        backgroundColor: ['#36A2EB', '#FF6384']
+      }]
+    }
+  });
+
+  // 3rd Movement Bar Chart (Average Coordinates)
+  chartInstances['3-mov-bar-chart'] = new Chart(document.getElementById("3-mov-bar-chart"), {
+    type: 'bar',
+    data: {
+      labels: ['Average X', 'Average Y'],
+      datasets: [{
+        label: 'Average Coordinates',
+        data: [
+          analytics.specificMovements.averageXCoord,
+          analytics.specificMovements.averageYCoord
+        ],
+        backgroundColor: '#36A2EB'
+      }]
+    }
+  });
+
+  // Replicase Active Pie Chart
+  chartInstances['replicase-active-pie-chart'] = new Chart(document.getElementById("replicase-active-pie-chart"), {
+    type: 'pie',
+    data: {
+      labels: ['Active', 'Inactive'],
+      datasets: [{
+        data: [analytics.replicase.active, analytics.replicase.inactive],
+        backgroundColor: ['#36A2EB', '#FF6384']
+      }]
+    }
+  });
+
+  // Replicase Average Chance
+  document.getElementById("replicase-average-chance").innerText = 
+    `Average Chance: ${analytics.replicase.averageChance}`;
+
+  // Replicase Top 5 Receptor Bar Chart
+  const receptorLabels = Object.keys(analytics.replicase.top5ActiveReceptors);
+  const receptorData = Object.values(analytics.replicase.top5ActiveReceptors);
+  chartInstances['replicase-receptor-bar-chart'] = new Chart(document.getElementById("replicase-receptor-bar-chart"), {
+    type: 'bar',
+    data: {
+      labels: receptorLabels,
+      datasets: [{
+        label: 'Top 5 Active Receptors',
+        data: receptorData,
+        backgroundColor: '#36A2EB'
+      }]
+    }
+  });
+
+  // Replicase Top 5 Substrate Bar Chart
+  const substrateLabels = Object.keys(analytics.replicase.top5ActiveSubstrates);
+  const substrateData = Object.values(analytics.replicase.top5ActiveSubstrates);
+  chartInstances['replicase-substrate-bar-chart'] = new Chart(document.getElementById("replicase-substrate-bar-chart"), {
+    type: 'bar',
+    data: {
+      labels: substrateLabels,
+      datasets: [{
+        label: 'Top 5 Active Substrates',
+        data: substrateData,
+        backgroundColor: '#36A2EB'
+      }]
+    }
+  });
+
+  // Identifier Frequency Bar Chart
+  const idLabels = Object.keys(analytics.randomIdentifier.frequency);
+  const idData = Object.values(analytics.randomIdentifier.frequency);
+  chartInstances['identifier-frequency-bar-chart'] = new Chart(document.getElementById("identifier-frequency-bar-chart"), {
+    type: 'bar',
+    data: {
+      labels: idLabels,
+      datasets: [{
+        label: 'Top 15 Identifier Frequency',
+        data: idData,
+        backgroundColor: '#36A2EB'
+      }]
+    }
+  });
+}
+
+function destroyAllCharts() {
+  for (const key in chartInstances) {
+    if (chartInstances[key]) {
+      chartInstances[key].destroy();
+      chartInstances[key] = null;
+    }
+  }
+}
+
+
 createObjects();
 drawObjects();
 updateObjects();
@@ -1187,6 +1547,7 @@ document.querySelector('.select-button').addEventListener("click", selectButton)
 document.querySelector('.print-button').addEventListener("click", printButton);
 document.querySelector('.reset-button').addEventListener("click", resetButton);
 document.getElementById("skip-button").addEventListener("click", skipButton);
+document.querySelector('.data-button').addEventListener("click", dataButton);
 document.getElementById("kill-button").addEventListener("click", killButton);
 document.getElementById('pie-chart-gene-options').addEventListener("change", optionsChanged);
 document.querySelector('.pick-button').addEventListener('click', pickButton);

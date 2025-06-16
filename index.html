@@ -24,6 +24,7 @@
           <button class="select-button" type="button">Select</button>
           <button class="print-button" type="button">Print</button>
           <button class="pick-button" type="button">Pick</button>
+          <button class="data-button" type="button">Data</button>
           <label>Skip</label>
           <input type="text" id="skip-value" name="skip-value">
           <input type="submit" value="Submit" id="skip-button">
@@ -66,6 +67,28 @@
         <h3 id="object-name"></h3>
         <div id="genome"></div>
         <div id="genes"></div>
+    </div>
+    <div class="large-data">
+      <h1>Large Data</h1>
+      <div id="large-graphs">
+        <h2>1st Movement Analysis</h2>
+        <canvas id="1-mov-active-pie-chart"></canvas>
+        <canvas id="1-mov-bar-chart"></canvas>
+        <h2>2nd Movement Analysis</h2>
+        <canvas id="2-mov-active-pie-chart"></canvas>
+        <canvas id="2-mov-bar-chart"></canvas>
+        <h2>3rd Movement Analysis</h2>
+        <canvas id="3-mov-x-active-pie-chart"></canvas>
+        <canvas id="3-mov-y-active-pie-chart"></canvas>
+        <canvas id="3-mov-bar-chart"></canvas>
+        <h2>Replicase Analysis</h2>
+        <canvas id="replicase-active-pie-chart"></canvas>
+        <p id="replicase-average-chance"></p>
+        <canvas id="replicase-receptor-bar-chart"></canvas>
+        <canvas id="replicase-substrate-bar-chart"></canvas>
+        <h2>Identifier Analysis</h2>
+        <canvas id="identifier-frequency-bar-chart"></canvas>
+      </div>
     </div>
   </main>
   <footer></footer>
